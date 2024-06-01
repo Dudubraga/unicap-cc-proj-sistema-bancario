@@ -1,45 +1,50 @@
 package Banco;
 
 public class Conta {
-    private String numeroAgencia;
-    private String numeroConta;
+    private int numeroAgencia;
+    private int numeroConta;
     private double saldo;
     private Cliente cliente;
 
-    public void deposito(double dinheiro){
-        // recebe uma quantia de dinheiro e salva no saldo da conta
+    public Conta(int numeroAgencia, int numeroConta, double saldo, Cliente cliente) { // OK
+        this.numeroAgencia = numeroAgencia;
+        this.numeroConta = numeroConta;
+        this.saldo = saldo;
+        this.cliente = cliente;
     }
 
-    public void saque(double dinheiro){
-        // remove uma quantia de dinheiro e retira do saldo da conta
+    public void deposito(double dinheiro){ // ok
+        this.saldo += dinheiro;
     }
 
-    public void transferencia(){
-        /*
-        recebe como parâmetro um objeto do tipo conta e
-        transfere uma quantia do saldo da conta atual para 
-        o saldo da conta que foi recebida como parâmetro. 
-        Garanta que exista saldo suficiente para isso.
-        */
+    public void saque(double dinheiro){ // ok
+        this.saldo -= dinheiro;
     }
 
-    public void exibirSaldo(){
-        /* 
-        apresenta uma mensagem de texto informando 
-        o nome do usuário e o quanto ele possui na conta
-        */
+    public void transferencia(Conta conta, double dinheiro) throws SaldoInsuficienteException{ // ok
+        if(this.saldo >= dinheiro){
+            this.saque(dinheiro);
+            conta.deposito(dinheiro);
+        }else{
+            throw new SaldoInsuficienteException("Saldo insuficiente. Transferência não realizada.");
+        }
+    }
+    
+    public void exibirSaldo(){ // ok
+        System.out.println("Nome do Usuário: " + this.cliente.getNome());
+        System.out.println("Saldo na Conta: " + this.saldo);
     }
 
-    public String getNumeroAgencia() {
+    public int getNumeroAgencia() {
         return numeroAgencia;
     }
-    public void setNumeroAgencia(String numeroAgencia) {
+    public void setNumeroAgencia(int numeroAgencia) {
         this.numeroAgencia = numeroAgencia;
     }
-    public String getNumeroConta() {
+    public int getNumeroConta() {
         return numeroConta;
     }
-    public void setNumeroConta(String numeroConta) {
+    public void setNumeroConta(int numeroConta) {
         this.numeroConta = numeroConta;
     }
     public double getSaldo() {

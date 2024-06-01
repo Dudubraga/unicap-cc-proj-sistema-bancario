@@ -1,12 +1,20 @@
 package Banco;
 
-public class Cliente {
+public class Cliente { // OK
     private String nome;
     private String endereco;
     private String profissao;
+    
+    public Cliente(String nome, String endereco, String profissao) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.profissao = profissao;
+    }
 
     public void exibirAtributos(){
-        // mostra na tela todos os atributos do cliente
+        System.out.println("Nome: " + this.nome);
+        System.out.println("Endereço: " + this.endereco);
+        System.out.println("Profissão: " + this.profissao);
     }
 
     public String getNome() {

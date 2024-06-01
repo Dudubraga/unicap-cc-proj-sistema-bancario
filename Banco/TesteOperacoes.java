@@ -1,60 +1,87 @@
 package Banco;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class TesteOperacoes {
-    private ArrayList<Cliente> listaClientes;
-    private ArrayList<Conta> listaContas;
+    private ArrayList<Cliente> listaClientes = new ArrayList<Cliente>();
+    private ArrayList<Conta> listaContas = new ArrayList<Conta>();
+    
+    Scanner scan = new Scanner(System.in);
+    
+    public void criarConta() throws SaldoInvalidoException, TipoDaContaInvalidoException { // OK
+        System.out.println("Informe o Nome, Endereço e Profissão do Cliente:");
+        String nome = scan.nextLine(); 
+        String endereco = scan.nextLine();
+        String profissao = scan.nextLine();
+        Cliente cliente = new Cliente(nome, endereco, profissao);
+        this.listaClientes.add(cliente);
+        try {
+            System.out.println("Informe o tipo da Conta:");
+            String tipoConta = scan.nextLine();
+            System.out.print("Informe o número da Agência: ");
+            int numAgencia = scan.nextInt();
+            System.out.print("Informe o número da Conta: ");
+            int numConta = scan.nextInt();
+            System.out.print("Informe o Saldo Inicial da Conta: ");
+            double saldoInicial = scan.nextDouble();
 
-    public void criarConta(){
-        /*
-        a)
-        Esse método deve receber as strings: nome, endereço e profissão 
-        do cliente por meio do método Scanner. Em seguida, essas informações 
-        devem instanciar um objeto do tipo Cliente e adicioná-lo no atributo 
-        listaClientes.
-        b) 
-        Receba uma string: tipoConta por meio do método Scanner, que deve 
-        informar qual o tipo de conta que o usuário deseja criar (poupança 
-        ou corrente). Crie um objeto de acordo com a classe especificada.
-        c) 
-        Para preencher o objeto, receba dois números inteiros (número da 
-        agência e conta) e um número flutuante: saldo, através do método 
-        Scanner. Adicione o objeto no atributo listaContas.
-        d) 
-        Use o tratamento de exceções para evitar que o usuário informe números 
-        de agência e conta como string, bem como para evitar que ele insira o 
-        valor do saldo menor do que zero.
-        */
+            if (saldoInicial < 0) {
+                throw new SaldoInvalidoException("Saldo não pode ser negativo.");
+            }
+            if(tipoConta == "poupança"){
+                ContaPoupanca conta = new ContaPoupanca(numAgencia, numConta, saldoInicial, cliente);
+                listaContas.add(conta);
+            } else if(tipoConta == "corrente"){
+                ContaCorrente conta = new ContaCorrente(numAgencia, numConta, saldoInicial, cliente);
+                listaContas.add(conta);
+            } else {
+                throw new TipoDaContaInvalidoException("Tipo de Conta inválido.");
+            }
+            
+        } catch (InputMismatchException e) {
+            System.out.println("Informação inválida.");
+        }
     }
 
-    public void realizarOperacoes(){
-        /*
-        a) 
-        Esse método deve receber quatro parâmetros: o número da agência e conta 
-        do cliente que deseja enviar o dinheiro, bem como o número da agência 
-        e conta do cliente que vai receber o dinheiro.
-        b) 
-        Através desses parâmetros, realize duas buscas no atributo listaContas 
-        para encontrar aconta do cliente que deseja enviar o dinheiro e a conta 
-        do cliente que vai receber o dinheiro. Dica: utilize um for para 
-        percorrer a lista e encontre o objeto através das funções do arraylist.
-        c) 
-        Use o método transferencia() existente na classe Conta para realizar 
-        a movimentação do valor.
-        */
+    public void realizarOperacoes(int numAgenciaEnvia, int numContaEnvia, int numAgenciaRecebe, int numContaRecebe) throws SaldoInsuficienteException{
+        for (Conta clienteEnvia : this.listaContas) {
+            if (clienteEnvia.getNumeroConta() == numContaEnvia) {
+                for (Conta clienteRecebe : this.listaContas) {
+                    if (clienteRecebe.getNumeroConta() == numContaRecebe) {
+                        System.out.print("Insira o valor do pix para doação ao pobre: ");
+                        double valor = scan.nextDouble();
+                        clienteEnvia.transferencia(clienteRecebe, valor);
+                    }
+                }
+            }
+        }
     }
 
-    public void exibirSaldo(){
-        /*
-        a) 
+    public void exibirSaldo(){ 
+        /* a) 
         Esse método deve receber como parâmetro os números de agência e conta 
         do usuário que terá o saldo consultado. Realize isso utilizando o 
         método Scanner.
-        b) 
-        Percorra a lista de contas, encontre a conta pesquisada e a salve em 
-        um objeto.
-        c) 
+        */
+        System.out.print("Informe o número da agência: ");
+        int numAgencia = scan.nextInt();
+        System.out.print("Informe o número da conta: ");
+        int numConta = scan.nextInt();
+        
+        /* b) 
+        Percorra a lista de contas, encontre a conta pesquisada e a salve em um objeto.
+        */
+        for (Conta conta : this.listaContas) {
+            if(conta.getNumeroConta() == numConta){
+                System.out.print("Informe a quantidade de meses: ");
+                int meses = scan.nextInt();
+                // simularSaldo
+                conta.exibirSaldo();
+            }
+        }
+        /* c) 
         Receba através do método Scanner a quantidade de meses que vão ser 
         simulados para demonstrar o saldo. Em seguida, utilizando polimorfismo, 
         execute o método exibirSaldo da classe Conta.
@@ -62,8 +89,7 @@ public class TesteOperacoes {
     }
 
     public void apresentarMenu(){
-        /*
-        a) 
+        /* a) 
         Esse método deve apresentar três mensagens: 
             i) Criar conta; 
             ii) Realizar operações; 
