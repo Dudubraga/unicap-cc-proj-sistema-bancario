@@ -10,30 +10,32 @@ public class TesteOperacoes {
     
     Scanner scan = new Scanner(System.in);
     
-    public void criarConta() throws SaldoInvalidoException, TipoDaContaInvalidoException { // OK
+    public void criarConta() throws SaldoInvalidoException, TipoDaContaInvalidoException {
         System.out.println("Informe o Nome, Endereço e Profissão do Cliente:");
         String nome = scan.nextLine(); 
         String endereco = scan.nextLine();
+        scan.nextLine();
         String profissao = scan.nextLine();
         Cliente cliente = new Cliente(nome, endereco, profissao);
         this.listaClientes.add(cliente);
         try {
-            System.out.println("Informe o tipo da Conta:");
+            System.out.println("Informe o tipo da Conta\nP - Poupança\nC - Corrente");
             String tipoConta = scan.nextLine();
-            System.out.print("Informe o número da Agência: ");
+            System.out.println("Informe o número da Agência: ");
             int numAgencia = scan.nextInt();
-            System.out.print("Informe o número da Conta: ");
+            System.out.println("Informe o número da Conta: ");
             int numConta = scan.nextInt();
-            System.out.print("Informe o Saldo Inicial da Conta: ");
+            System.out.println("Informe o Saldo Inicial da Conta: ");
             double saldoInicial = scan.nextDouble();
 
             if (saldoInicial < 0) {
                 throw new SaldoInvalidoException("Saldo não pode ser negativo.");
             }
-            if(tipoConta == "poupança"){
+
+            if(tipoConta.equals("P")){
                 ContaPoupanca conta = new ContaPoupanca(numAgencia, numConta, saldoInicial, cliente);
                 listaContas.add(conta);
-            } else if(tipoConta == "corrente"){
+            } else if(tipoConta.equals("C")){
                 ContaCorrente conta = new ContaCorrente(numAgencia, numConta, saldoInicial, cliente);
                 listaContas.add(conta);
             } else {
@@ -60,47 +62,54 @@ public class TesteOperacoes {
     }
 
     public void exibirSaldo(){ 
-        /* a) 
-        Esse método deve receber como parâmetro os números de agência e conta 
-        do usuário que terá o saldo consultado. Realize isso utilizando o 
-        método Scanner.
-        */
         System.out.print("Informe o número da agência: ");
         int numAgencia = scan.nextInt();
         System.out.print("Informe o número da conta: ");
         int numConta = scan.nextInt();
-        
-        /* b) 
-        Percorra a lista de contas, encontre a conta pesquisada e a salve em um objeto.
-        */
         for (Conta conta : this.listaContas) {
-            if(conta.getNumeroConta() == numConta){
-                System.out.print("Informe a quantidade de meses: ");
+            if(conta.getNumeroConta() == numConta && conta.getNumeroAgencia() == numAgencia){
+                System.out.print("Informe a quantidade de meses para simulação: ");
                 int meses = scan.nextInt();
-                // simularSaldo
                 conta.exibirSaldo();
+                double simulacao = conta.simularOperacao(meses);
+                System.out.println("Simulação de saldo após " + meses +  " meses: R$" + simulacao);
             }
         }
-        /* c) 
-        Receba através do método Scanner a quantidade de meses que vão ser 
-        simulados para demonstrar o saldo. Em seguida, utilizando polimorfismo, 
-        execute o método exibirSaldo da classe Conta.
-        */
     }
 
-    public void apresentarMenu(){
-        /* a) 
-        Esse método deve apresentar três mensagens: 
-            i) Criar conta; 
-            ii) Realizar operações; 
-            iii) Exibir saldo;
-        b) 
-        De acordo com o valor recebido pelo usuário através do método Scanner, 
-        o método direciona para cada ação ao seu respectivo método.
-        c) 
-        Utilize um while para executar o método apresentarMenu até que o usuário 
-        deseje parar as operações 
-        (obs: ao final de cada operação essa pergunta pode ser feita ao usuário).
-        */
+    public void apresentarMenu() throws SaldoInsuficienteException, SaldoInvalidoException, TipoDaContaInvalidoException {
+        int op;
+        do {
+            System.out.println("1 - Criar Conta");
+            System.out.println("2 - Realizar Operações");
+            System.out.println("3 - Exibir Saldo");
+            System.out.println("0 - Encerrar Programa");
+            op = scan.nextInt();
+            switch (op) {
+                case 1:
+                    criarConta();
+                    break;
+                case 2:
+                    System.out.println("Informe o número da agência que deseja realizar a transferência: ");
+                    int numAgenciaEnvia = scan.nextInt();
+                    System.out.println("Informe o número da conta que deseja realizar a transferência: ");
+                    int numContaEnvia = scan.nextInt();
+                    System.out.println("Informe o número da agência de destino: ");
+                    int numAgenciaRecebe = scan.nextInt();
+                    System.out.println("Informe o número da conta de destino: ");
+                    int numContaRecebe = scan.nextInt();
+                    realizarOperacoes(numAgenciaEnvia, numContaEnvia, numAgenciaRecebe, numContaRecebe);
+                    break;
+                case 3:
+                    exibirSaldo();
+                    break;
+                case 0:
+                    System.out.println("Encerrando...");
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+                    break;
+            }
+        } while (op != 0);
     }
 }
